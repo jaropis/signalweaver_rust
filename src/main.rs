@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
 
+mod edf_utils;
 // basic structure to hold our ECG data points
 struct EcgPoint {
     time: f64,
@@ -39,6 +40,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     write_positions_to_file(&qrs_positions, &output_path)?;
 
     println!("Detection complete.");
+
+    edf_utils::print_edf_signals("example.edf")?;
 
     Ok(())
 }

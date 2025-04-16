@@ -4,3 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+edf = { git = "https://github.com/jaropis/edf", branch = "feature-edf-data-readin"}
+
