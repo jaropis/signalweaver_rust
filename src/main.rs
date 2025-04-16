@@ -1,15 +1,15 @@
 use std::cmp::Ordering;
 use std::error::Error;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
 
+mod csv_utils;
 mod edf_utils;
+mod models;
+use csv_utils::read_ecg_data;
+use models::EcgPoint;
+use std::io::{self, Write};
 // basic structure to hold our ECG data points
-struct EcgPoint {
-    time: f64,
-    voltage: f64,
-}
 
 fn main() -> Result<(), Box<dyn Error>> {
     // getting the current directory
@@ -44,42 +44,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     edf_utils::print_edf_signals("example.edf")?;
 
     Ok(())
-}
-
-fn read_ecg_data<P: AsRef<Path>>(path: P) -> Result<Vec<EcgPoint>, Box<dyn Error>> {
-    // opening the file
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
-
-    let mut data = Vec::new();
-    let mut header_skipped = false;
-
-    // reading each line
-    for line in reader.lines() {
-        let line = line?;
-
-        // skipping the header
-        if !header_skipped {
-            header_skipped = true;
-            continue;
-        }
-
-        // parsing each line
-        let parts: Vec<&str> = line.split(',').collect();
-        if parts.len() == 2 {
-            let time = parts[0].trim().parse::<f64>()?;
-            let voltage = parts[1].trim().parse::<f64>()?;
-
-            data.push(EcgPoint { time, voltage });
-        }
-    }
-
-    // Print total data points
-    if !data.is_empty() {
-        println!("Total data points: {}", data.len());
-    }
-
-    Ok(data)
 }
 
 fn detect_qrs_complexes(ecg_data: &[EcgPoint]) -> Vec<f64> {
