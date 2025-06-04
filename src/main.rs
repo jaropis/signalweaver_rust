@@ -340,43 +340,6 @@ fn find_qrs_peaks(processed_signal: &[f64], ecg_data: &[EcgPoint], fs: f64) -> V
     qrs_positions
 }
 
-fn compute_derivative(data: &[f64]) -> Vec<f64> {
-    let mut derivative = Vec::with_capacity(data.len());
-
-    for i in 2..data.len() {
-        // Using a wider difference formula for better noise tolerance
-        let diff = (data[i] - data[i - 2]) / 2.0;
-        derivative.push(diff);
-    }
-
-    // Add zeros at the beginning to maintain length
-    derivative.insert(0, 0.0);
-    derivative.insert(0, 0.0);
-
-    derivative
-}
-
-fn moving_average(data: &[f64], window_size: usize) -> Vec<f64> {
-    if window_size == 0 || data.is_empty() {
-        return data.to_vec();
-    }
-
-    let half_window = window_size / 2;
-    let mut result = Vec::with_capacity(data.len());
-
-    for i in 0..data.len() {
-        let start = if i >= half_window { i - half_window } else { 0 };
-        let end = std::cmp::min(i + half_window + 1, data.len());
-
-        let sum: f64 = data[start..end].iter().sum();
-        let count = end - start;
-
-        result.push(sum / count as f64);
-    }
-
-    result
-}
-
 fn write_positions_to_file<P: AsRef<Path>>(positions: &[f64], path: P) -> io::Result<()> {
     let mut file = File::create(path)?;
 
